@@ -81,7 +81,7 @@ def main():
     
     #SetupWindow
     screen = pygame.display.set_mode((1200,900))
-    pygame.display.set_caption('Odometry Test')
+    pygame.display.set_caption('VEX-bot-test')
     
     font = pygame.font.SysFont('Comic Sans MS', 18)
     

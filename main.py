@@ -173,7 +173,7 @@ def main():
                                 f.write("%s\n" % item)
                         saved = True
 
-                if PID_1.error > 0.1:
+                if True:
                     input = PID_1.update(bot_1.xpos)
                 else:
                     input = 0

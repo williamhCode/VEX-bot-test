@@ -8,7 +8,7 @@ Created on Mon Feb  1 08:33:54 2021
 
 import math
 
-class vex_bot:
+class VexBot:
     
     def __init__(self, xpos, ypos, angle, distance, wheel_width, motor_speed):
         # true states
@@ -19,9 +19,9 @@ class vex_bot:
         self.wheel_width = wheel_width
         self.motor_speed = motor_speed
         
-    def input(self, left_input, right_input):
-        self.intensityL = self.motor_speed * min(1, left_input)
-        self.intensityR = self.motor_speed * min(1, right_input)
+    def input(self, leftInput, rightInput):
+        self.intensityL = self.motor_speed * min(1, leftInput)
+        self.intensityR = self.motor_speed * min(1, rightInput)
 
     def update(self, dt):
         translateL = self.intensityL * dt

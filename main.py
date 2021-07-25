@@ -7,8 +7,9 @@ Created on Sun Jan 31 18:22:36 2021
 """
 
 import pygame
-from bot import vex_bot
-from system import PID
+from bot import VexBot
+from loader import ActionsLoader
+from actions import *
 
 import time as t
 
@@ -18,7 +19,7 @@ def rotate(surface, angle, pivot, offset):
     rect = rotated_image.get_rect(center= pivot+rotated_offset)
     return rotated_image, rect
         
-def showPositions(screen, vehicle: vex_bot):
+def showPositions(screen, vehicle: VexBot):
     wheelL_xpos, wheelL_ypos, wheelR_xpos, wheelR_ypos = vehicle.getWheelPositions()
     pygame.draw.circle(screen, (0,0,225), (wheelL_xpos, wheelL_ypos),5)
     pygame.draw.circle(screen, (0,0,225), (wheelR_xpos, wheelR_ypos),5)
@@ -27,14 +28,15 @@ def showPositions(screen, vehicle: vex_bot):
 def main():
     botImg = pygame.image.load('pic/vex_bot.png')
     botImg = pygame.transform.smoothscale(botImg, (120,130))
-    bot_1 = vex_bot(300,500,-90, botImg.get_height(), botImg.get_width(), 350)
-    PID_1 = PID(0.02, 0.00001, 0.1)
+    bot_1 = VexBot(300,500,-90, botImg.get_height(), botImg.get_width(), 350)
+    actions = [MoveInLine(1000,400)]
+    loader = ActionsLoader(actions)
 
     # positions = []
     # saved = False
     
     #SetupWindow
-    screen = pygame.display.set_mode((500,500),pygame.RESIZABLE)
+    screen = pygame.display.set_mode((1200,900),pygame.RESIZABLE)
     pygame.display.set_caption('VEX-bot-test')
     
     font = pygame.font.SysFont('Comic Sans MS', 18)
@@ -85,7 +87,7 @@ def main():
                 if event.key == pygame.K_m:
                     if mode == 'manual':
                         mode = 'auton'
-                        PID_1.setUp(bot_1.xpos, 800)
+                        loader.setUp(bot_1)
                     elif mode == 'auton':
                         mode = 'manual'
 
@@ -124,13 +126,12 @@ def main():
                 #                 f.write("%s\n" % item)
                 #         saved = True
 
-                if abs(PID_1.error) > 0.1:
-                    input = PID_1.update(bot_1.xpos)
-                else:
-                    input = 0
-                bot_1.input(input, input)
+                leftInput, rightInput = loader.update(bot_1)
+                bot_1.input(leftInput, rightInput)
 
             bot_1.update(dt)
+
+            pygame.draw.line(screen, (0,0,0), (300,400), (1000,400))
 
             botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos,bot_1.ypos], pygame.math.Vector2(0,0))
             screen.blit(botImg_copy, botImg_copy_rect)

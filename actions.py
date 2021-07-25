@@ -7,17 +7,17 @@ class MoveInLine:
         self.gXpos = xpos
         self.gYpos = ypos
 
-        kP = 0.005
-        kI = 0
-        kD = 0.2
+        kP = 0.015
+        kI = 0.0
+        kD = 0.3
         self.pid = PID(kP, kI, kD)
 
     def setUp(self, bot:VexBot):
-        self.sXpos = 300
-        self.sYpos = 400
+        # self.sXpos = 300
+        # self.sYpos = 400
 
-        # self.sXpos = bot.xpos
-        # self.sYpos = bot.ypos
+        self.sXpos = bot.xpos
+        self.sYpos = bot.ypos
 
         cte = self.getCTE(bot)
 
@@ -25,19 +25,19 @@ class MoveInLine:
 
     def update(self, bot:VexBot):
         cte = self.getCTE(bot)
-
         output = self.pid.update(cte)
 
         leftInput = 1
         rightInput = 1
         
-        return leftInput + min(output, 0), rightInput - max(output, 0)
+        return max(-1, leftInput + min(output, 0)), max(-1, rightInput - max(output, 0))
 
     def stop(self, bot:VexBot):
         if abs(self.gXpos - bot.xpos) < 5 and abs(self.gYpos - bot.ypos) < 5:
             return True
         return False
 
+    # cross track error
     def getCTE(self, bot:VexBot):
         x1 = self.gXpos
         y1 = self.gYpos

@@ -28,8 +28,8 @@ def showPositions(screen, vehicle: VexBot):
 def main():
     botImg = pygame.image.load('pic/vex_bot.png')
     botImg = pygame.transform.smoothscale(botImg, (120,130))
-    bot_1 = VexBot(300,500,-90, botImg.get_height(), botImg.get_width(), 350)
-    actions = [MoveInLine(1000,400)]
+    bot_1 = VexBot(300,200,-90, botImg.get_height(), botImg.get_width(), 350)
+    actions = [MoveInLine(1000,200), MoveInLine(1000,800), MoveInLine(300,800), MoveInLine(300,200)]
     loader = ActionsLoader(actions)
 
     # positions = []
@@ -131,14 +131,18 @@ def main():
 
             bot_1.update(dt)
 
-            pygame.draw.line(screen, (0,0,0), (300,400), (1000,400))
 
             botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos,bot_1.ypos], pygame.math.Vector2(0,0))
             screen.blit(botImg_copy, botImg_copy_rect)
             showPositions(screen, bot_1)
 
-            position = font.render(f'{bot_1.xpos:.2f}, {bot_1.ypos:.2f}', False, (0,0,0))
+            position = font.render(f'Mode: {mode}, Coords: {bot_1.xpos:.2f}, {bot_1.ypos:.2f}', False, (0,0,0))
             screen.blit(position, (25, 25))
+
+            pygame.draw.circle(screen, (0,0,0), (1000,200),5)
+            pygame.draw.circle(screen, (0,0,0), (1000,800),5)
+            pygame.draw.circle(screen, (0,0,0), (300,800),5)
+            pygame.draw.circle(screen, (0,0,0), (300,200),5)
                 
             pygame.display.update()
         

@@ -1,7 +1,7 @@
 from bot import VexBot
 import math
 
-class MoveInLine:
+class MoveToPointInLine:
 
     def __init__(self, xpos, ypos):
         self.gXpos = xpos

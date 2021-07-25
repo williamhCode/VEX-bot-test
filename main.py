@@ -29,7 +29,7 @@ def main():
     botImg = pygame.image.load('pic/vex_bot.png')
     botImg = pygame.transform.smoothscale(botImg, (120,130))
     bot_1 = VexBot(300,200,-90, botImg.get_height(), botImg.get_width(), 350)
-    actions = [MoveInLine(1000,200), MoveInLine(1000,800), MoveInLine(300,800), MoveInLine(300,200)]
+    actions = [MoveToPointInLine(1000,200), MoveToPointInLine(1000,800), MoveToPointInLine(300,800), MoveToPointInLine(300,200)]
     loader = ActionsLoader(actions)
 
     # positions = []

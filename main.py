@@ -30,8 +30,8 @@ def main():
     bot_1 = vex_bot(300,500,-90, botImg.get_height(), botImg.get_width(), 350)
     PID_1 = PID(0.02, 0.00001, 0.1)
 
-    positions = []
-    saved = False
+    # positions = []
+    # saved = False
     
     #SetupWindow
     screen = pygame.display.set_mode((500,500),pygame.RESIZABLE)
@@ -116,13 +116,13 @@ def main():
                     right_input -= 1
                 bot_1.input(left_input, right_input)
             elif mode == 'auton':
-                positions.append(round(bot_1.xpos, 2))
-                if not saved:
-                    if round(bot_1.xpos, 2) == 800:
-                        with open('positions.txt', 'w') as f:
-                            for item in positions:
-                                f.write("%s\n" % item)
-                        saved = True
+                # positions.append(round(bot_1.xpos, 2))
+                # if not saved:
+                #     if round(bot_1.xpos, 2) == 800:
+                #         with open('positions.txt', 'w') as f:
+                #             for item in positions:
+                #                 f.write("%s\n" % item)
+                #         saved = True
 
                 if abs(PID_1.error) > 0.1:
                     input = PID_1.update(bot_1.xpos)

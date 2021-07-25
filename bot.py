@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Feb  1 08:33:54 2021
-
-@author: williamhou
-"""
-
 import math
 
 class VexBot:

@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 31 18:22:36 2021
-
-@author: williamhou
-"""
-
 import pygame
 from bot import VexBot
 from loader import ActionsLoader

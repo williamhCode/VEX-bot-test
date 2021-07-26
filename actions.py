@@ -3,9 +3,10 @@ import math
 
 class MoveToPointInLine:
 
-    def __init__(self, xpos, ypos):
+    def __init__(self, xpos, ypos, reverse:bool=False):
         self.gXpos = xpos
         self.gYpos = ypos
+        self.reverse = reverse
 
         kP = 0.015
         kI = 0.0
@@ -13,9 +14,6 @@ class MoveToPointInLine:
         self.pid = PID(kP, kI, kD)
 
     def setUp(self, bot:VexBot):
-        # self.sXpos = 300
-        # self.sYpos = 400
-
         self.sXpos = bot.xpos
         self.sYpos = bot.ypos
 
@@ -30,6 +28,8 @@ class MoveToPointInLine:
         leftInput = 1
         rightInput = 1
         
+        if self.reverse:
+            return -max(-1, leftInput - max(output, 0)), -max(-1, rightInput + min(output, 0))
         return max(-1, leftInput + min(output, 0)), max(-1, rightInput - max(output, 0))
 
     def stop(self, bot:VexBot):

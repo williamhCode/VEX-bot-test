@@ -12,8 +12,8 @@ class VexBot:
         self.motor_speed = motor_speed
         
     def input(self, leftInput, rightInput):
-        self.intensityL = self.motor_speed * min(1, leftInput)
-        self.intensityR = self.motor_speed * min(1, rightInput)
+        self.intensityL = self.motor_speed * max(min(1, leftInput), -1)
+        self.intensityR = self.motor_speed * max(min(1, rightInput), -1)
 
     def update(self, dt):
         translateL = self.intensityL * dt
@@ -26,7 +26,7 @@ class VexBot:
             dx, dy, dtheta = self.turnRightTransformation(translateL, translateR)
             
         self.xpos += dx
-        self.ypos -= dy
+        self.ypos += dy
         self.angle += math.degrees(dtheta)
         
     def turnRightTransformation(self, translateL, translateR):
@@ -55,7 +55,7 @@ class VexBot:
 
     def getOffsetPosition(self, offset, angle_diff):
         xpos = self.xpos + offset * math.cos(math.radians(self.angle + angle_diff))
-        ypos = self.ypos - offset * math.sin(math.radians(self.angle + angle_diff))
+        ypos = self.ypos + offset * math.sin(math.radians(self.angle + angle_diff))
 
         return xpos, ypos
 

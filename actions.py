@@ -29,8 +29,8 @@ class MoveToPointInLine:
         rightInput = 1
         
         if self.reverse:
-            return -max(-1, leftInput - max(output, 0)), -max(-1, rightInput + min(output, 0))
-        return max(-1, leftInput + min(output, 0)), max(-1, rightInput - max(output, 0))
+            return -leftInput + max(output, 0), -rightInput - min(output, 0)
+        return leftInput + min(output, 0), rightInput - max(output, 0)
 
     def stop(self, bot:VexBot):
         if abs(self.gXpos - bot.xpos) < 5 and abs(self.gYpos - bot.ypos) < 5:

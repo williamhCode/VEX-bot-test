@@ -13,14 +13,17 @@ def rotate(surface, angle, pivot, offset):
         
 def showPositions(screen, vehicle: VexBot):
     wheelL_xpos, wheelL_ypos, wheelR_xpos, wheelR_ypos = vehicle.getWheelPositions()
-    pygame.draw.circle(screen, (0,0,225), (wheelL_xpos, wheelL_ypos),5)
-    pygame.draw.circle(screen, (0,0,225), (wheelR_xpos, wheelR_ypos),5)
-    pygame.draw.circle(screen, (225,225,225), (vehicle.xpos, vehicle.ypos),5)
+    pygame.draw.circle(screen, (0,0,225), (wheelL_xpos, revY(wheelL_ypos)),5)
+    pygame.draw.circle(screen, (0,0,225), (wheelR_xpos, revY(wheelR_ypos)),5)
+    pygame.draw.circle(screen, (225,225,225), (vehicle.xpos, revY(vehicle.ypos)),5)
+
+def revY(ypos):
+    return -ypos + 900
             
 def main():
     botImg = pygame.image.load('pic/bot.png')
     botImg = pygame.transform.smoothscale(botImg, (120,130))
-    bot_1 = VexBot(300,200,90, botImg.get_height(), botImg.get_width(), 350)
+    bot_1 = VexBot(300,200,0, botImg.get_height(), botImg.get_width(), 350)
     actions = [MoveToPointInLine(1000,200,True), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True)]
     loader = ActionsLoader(actions)
 
@@ -123,12 +126,12 @@ def main():
 
             bot_1.update(dt)
 
-            pygame.draw.circle(screen, (0,0,0), (1000,200),5)
-            pygame.draw.circle(screen, (0,0,0), (1000,800),5)
-            pygame.draw.circle(screen, (0,0,0), (300,800),5)
-            pygame.draw.circle(screen, (0,0,0), (300,200),5)
+            # pygame.draw.circle(screen, (0,0,0), (1000,200),5)
+            # pygame.draw.circle(screen, (0,0,0), (1000,800),5)
+            # pygame.draw.circle(screen, (0,0,0), (300,800),5)
+            # pygame.draw.circle(screen, (0,0,0), (300,200),5)
 
-            botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos,bot_1.ypos], pygame.math.Vector2(0,0))
+            botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos, revY(bot_1.ypos)], pygame.math.Vector2(0,0))
             screen.blit(botImg_copy, botImg_copy_rect)
             showPositions(screen, bot_1)
 

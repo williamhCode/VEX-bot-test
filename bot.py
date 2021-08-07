@@ -23,12 +23,14 @@ class VexBot:
             dx, dy = self.rotateVector(0, translateL, math.radians(self.angle))
             dtheta = 0
         else:
-            dx, dy, dtheta = self.turnRightTransformation(translateL, translateR)
+            # dx, dy, dtheta = self.turnRightTransformation(translateL, translateR)
+            dx, dy, dtheta = rRT(translateL, translateR, self.wheel_width, self.angle)
+            
             
         self.xpos += dx
         self.ypos += dy
         self.angle += math.degrees(dtheta)
-        
+
     def turnRightTransformation(self, translateL, translateR):
         dtheta = (translateL - translateR)/self.wheel_width
         radius = translateR/dtheta + self.wheel_width/2
@@ -64,4 +66,18 @@ class VexBot:
         wheelR_xpos, wheelR_ypos = self.getOffsetPosition(self.wheel_width/2, 0)
 
         return wheelL_xpos, wheelL_ypos, wheelR_xpos, wheelR_ypos
-    
+
+def rRT(translateL, translateR, wheel_width, angle):
+    dtheta = (translateL - translateR)/wheel_width
+    radius = translateR/dtheta + wheel_width/2
+    dx = radius - math.cos(dtheta) * radius
+    dy = math.sin(dtheta) * radius
+    dx, dy = rotateVector(dx, dy, math.radians(angle))
+
+    return dx, dy, -dtheta   
+
+def rotateVector(x, y, angle):
+        xprime = x * math.cos(angle) - y * math.sin(angle)
+        yprime = x * math.sin(angle) + y * math.cos(angle)
+
+        return xprime, yprime

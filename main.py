@@ -1,9 +1,11 @@
 import pygame
+import numpy
 from bot import VexBot
 from loader import ActionsLoader
 from actions import *
 
-import time as t
+
+import time as ti
 
 def rotate(surface, angle, pivot, offset):
     rotated_image = pygame.transform.rotozoom(surface, angle, 1)
@@ -20,38 +22,46 @@ def showPositions(screen, vehicle: VexBot):
 def revY(ypos):
     return -ypos + 900
             
+from pygame.locals import DOUBLEBUF
 def main():
-    botImg = pygame.image.load('pic/bot.png')
+    #SetupWindow
+    flags = DOUBLEBUF
+    screen = pygame.display.set_mode((1200,900), flags)
+    screen.set_alpha(None)
+    pygame.display.set_caption('VEX-bot-test')
+    
+    font = pygame.font.SysFont('Comic Sans MS', 18)
+
+    botImg = pygame.image.load('pic/bot.png').convert()
     botImg = pygame.transform.smoothscale(botImg, (120,130))
+
     bot_1 = VexBot(300,200,0, botImg.get_height(), botImg.get_width(), 350)
     actions = [MoveToPointInLine(1000,200,True), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True)]
     loader = ActionsLoader(actions)
 
+    spline = MoveHermiteSpline((1000, 200, 45), (1000, 800, 135), (300, 800, 225), (300, 200, 315))
+    x = []
+    y = []
+    t = numpy.arange(0, spline.range, spline.range/300)
+    for i in t:
+        x.append(spline.splineX(i))
+        y.append(spline.splineY(i))
+
     # positions = []
     # saved = False
-    
-    #SetupWindow
-    screen = pygame.display.set_mode((1200,900),pygame.RESIZABLE)
-    pygame.display.set_caption('VEX-bot-test')
-    
-    font = pygame.font.SysFont('Comic Sans MS', 18)
-    
+
     #Game Loop
-    key_w = False
-    key_s = False
-    key_up = False
-    key_down = False
     mode = 'manual'
 
     frame_cap = 1.0/60
-    time = t.time()
+    time = ti.time()
     unprocessed = 0
 
     clock = pygame.time.Clock()
 
     while True:
         can_render = False
-        time_2 = t.time()
+        time_2 = ti.time()
         passed = time_2 - time
         unprocessed += passed
         time = time_2
@@ -70,14 +80,8 @@ def main():
                 return
             
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    key_w = True
-                if event.key == pygame.K_s:
-                    key_s = True
-                if event.key == pygame.K_UP:
-                    key_up = True
-                if event.key == pygame.K_DOWN:
-                    key_down = True
+                if event.key == pygame.K_r:
+                    loader.reset(bot_1)
                 
                 if event.key == pygame.K_m:
                     if mode == 'manual':
@@ -86,31 +90,27 @@ def main():
                     elif mode == 'auton':
                         mode = 'manual'
 
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_w:
-                    key_w = False
-                if event.key == pygame.K_s:
-                    key_s = False
-                if event.key == pygame.K_UP:
-                    key_up = False
-                if event.key == pygame.K_DOWN:
-                    key_down = False
-
         if can_render:
-            dt = clock.tick()/1000
+            # dt = clock.tick()
+            dt = 1/60
+            # print(clock.get_fps())
             screen.fill((255,255,255))
 
             if mode == 'manual':
                 left_input = 0
                 right_input = 0
-                if key_w:
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_w]:
                     left_input += 1
-                if key_s:
+                if keys[pygame.K_s]:
                     left_input -= 1
-                if key_up:
+                if keys[pygame.K_UP]:
                     right_input += 1
-                if key_down:
+                if keys[pygame.K_DOWN]:
                     right_input -= 1
+                    
                 bot_1.input(left_input, right_input)
             elif mode == 'auton':
                 # positions.append(round(bot_1.xpos, 2))
@@ -123,13 +123,15 @@ def main():
 
                 leftInput, rightInput = loader.update(bot_1)
                 bot_1.input(leftInput, rightInput)
-
             bot_1.update(dt)
 
-            # pygame.draw.circle(screen, (0,0,0), (1000,200),5)
-            # pygame.draw.circle(screen, (0,0,0), (1000,800),5)
-            # pygame.draw.circle(screen, (0,0,0), (300,800),5)
-            # pygame.draw.circle(screen, (0,0,0), (300,200),5)
+            pygame.draw.circle(screen, (0,0,0), (1000,revY(200)),5)
+            pygame.draw.circle(screen, (0,0,0), (1000,revY(800)),5)
+            pygame.draw.circle(screen, (0,0,0), (300,revY(800)),5)
+            pygame.draw.circle(screen, (0,0,0), (300,revY(200)),5)
+
+            for i in range(len(t)):
+                pygame.draw.circle(screen, (0,0,0), (int(x[i]),revY(int(y[i]))),5)
 
             botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos, revY(bot_1.ypos)], pygame.math.Vector2(0,0))
             screen.blit(botImg_copy, botImg_copy_rect)

@@ -35,11 +35,13 @@ def main():
     botImg = pygame.image.load('pic/bot.png').convert()
     botImg = pygame.transform.smoothscale(botImg, (120,130))
 
-    bot_1 = VexBot(300,200,0, botImg.get_height(), botImg.get_width(), 350)
-    actions = [MoveToPointInLine(1000,200,True), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True)]
+    bot_1 = VexBot(1000,200,0, botImg.get_height(), botImg.get_width(), 350)
+
+    straight = MoveToPointInLine(1000,200,True), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True)
+    spline = MoveHermiteSpline((1000, 200, 90), (1000, 800, 135), (300, 800, 225), (500, 200, 315))
+    actions = [spline]
     loader = ActionsLoader(actions)
 
-    spline = MoveHermiteSpline((1000, 200, 45), (1000, 800, 135), (300, 800, 225), (300, 200, 315))
     x = []
     y = []
     t = numpy.arange(0, spline.range, spline.range/300)
@@ -92,8 +94,8 @@ def main():
 
         if can_render:
             # dt = clock.tick()
-            dt = 1/60
             # print(clock.get_fps())
+            dt = 1/60
             screen.fill((255,255,255))
 
             if mode == 'manual':

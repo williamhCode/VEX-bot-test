@@ -12,7 +12,7 @@ def rotate(surface, angle, pivot, offset):
     rotated_offset = offset.rotate(-angle)
     rect = rotated_image.get_rect(center= pivot+rotated_offset)
     return rotated_image, rect
-        
+
 def showPositions(screen, vehicle: VexBot):
     wheelL_xpos, wheelL_ypos, wheelR_xpos, wheelR_ypos = vehicle.getWheelPositions()
     pygame.draw.circle(screen, (0,0,225), (wheelL_xpos, revY(wheelL_ypos)),5)
@@ -22,23 +22,22 @@ def showPositions(screen, vehicle: VexBot):
 def revY(ypos):
     return -ypos + 900
             
-from pygame.locals import DOUBLEBUF
 def main():
     #SetupWindow
-    flags = DOUBLEBUF
-    screen = pygame.display.set_mode((1200,900), flags)
+    screen = pygame.display.set_mode((1200,900), pygame.SCALED, vsync = 1)
     screen.set_alpha(None)
     pygame.display.set_caption('VEX-bot-test')
     
     font = pygame.font.SysFont('Comic Sans MS', 18)
 
-    botImg = pygame.image.load('pic/bot.png').convert()
+    botImg = pygame.image.load('pic/bot.png').convert_alpha()
     botImg = pygame.transform.smoothscale(botImg, (120,130))
 
-    bot_1 = VexBot(1000,200,0, botImg.get_height(), botImg.get_width(), 350)
+    bot_1 = VexBot(200,200,0, botImg.get_height(), botImg.get_width(), 350)
 
     straight = MoveToPointInLine(1000,200,True), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True)
     spline = MoveHermiteSpline((1000, 200, 90), (1000, 800, 135), (300, 800, 225), (500, 200, 315))
+    spline = MoveHermiteSpline((200, 200, 0), (600, 100, 45), (800, 500, 90), (300, 700, 180))
     actions = [spline]
     loader = ActionsLoader(actions)
 
@@ -92,7 +91,7 @@ def main():
                     elif mode == 'auton':
                         mode = 'manual'
 
-        if can_render:
+        if True:
             # dt = clock.tick()
             # print(clock.get_fps())
             dt = 1/60

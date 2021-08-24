@@ -100,9 +100,9 @@ class MoveHermiteSpline:
 
         self.reverse = reverse
 
-        kP = 0.015
+        kP = 0.03
         kI = 0.0
-        kD = 0.3
+        kD = 0.4
         self.turnPID = PID(kP, kI, kD)
 
         kP = 0.01
@@ -111,7 +111,7 @@ class MoveHermiteSpline:
         self.PID = PID(kP, kI, kD)
 
     def setUp(self, bot:VexBot):
-        self.t = 0.1
+        self.t = 0
 
         cte = self.getCTE(bot)
         self.turnPID.setUp(cte, 0)
@@ -143,16 +143,16 @@ class MoveHermiteSpline:
     def getCTE(self, bot:VexBot):
         rate = 0.1
         while True:
-            x = self.splineX(self.t)
-            y = self.splineY(self.t)
-            dx = self.splineX(self.t, 1)
-            dy = self.splineY(self.t, 1)
+            x = self.splineX(self.t, extrapolate=True)
+            y = self.splineY(self.t, extrapolate=True)
+            dx = self.splineX(self.t, 1, extrapolate=True)
+            dy = self.splineY(self.t, 1, extrapolate=True)
             slope = 2 * (x - bot.xpos) * dx + 2 * (y - bot.ypos) * dy
             if abs(slope) < 0.1:
                 break
             self.t += -slope * rate
         dot = dy * (bot.xpos - x) + -dx * (bot.ypos - y)
-        cte = ((x - bot.xpos) ** 2 + (y - bot.ypos) ** 2) ** 1
+        cte = ((x - bot.xpos) ** 2 + (y - bot.ypos) ** 2) ** 0.5 * 1
 
         return math.copysign(cte, dot)
 

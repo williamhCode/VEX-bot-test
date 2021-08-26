@@ -4,7 +4,6 @@ from bot import VexBot
 from loader import ActionsLoader
 from actions import *
 
-
 import time as ti
 
 def rotate(surface, angle, pivot, offset):

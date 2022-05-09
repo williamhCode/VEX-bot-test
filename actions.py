@@ -10,7 +10,7 @@ class MoveToPointInLine:
 
         kP = 0.015
         kI = 0.0
-        kD = 0.3
+        kD = 0.1
         self.turnPID = PID(kP, kI, kD)
 
         kP = 0.01
@@ -65,7 +65,7 @@ class MoveToPointInLine:
         y2 = self.gYpos
         x0 = bot.xpos
         y0 = bot.ypos
-        num = (x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1)
+        num = (x2 - x1) * (y1 - y0) - (y2 - y1) * (x1 - x0) 
         deno = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
         return num/deno
 
@@ -100,7 +100,7 @@ class MoveHermiteSpline:
 
         self.reverse = reverse
 
-        kP = 0.03
+        kP = 0.05
         kI = 0.0
         kD = 0.4
         self.turnPID = PID(kP, kI, kD)

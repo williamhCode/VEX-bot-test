@@ -11,9 +11,9 @@ class VexBot:
         self.wheel_width = wheel_width
         self.motor_speed = motor_speed
         
-    def input(self, leftInput, rightInput):
-        self.intensityL = self.motor_speed * max(min(1, leftInput), -1)
-        self.intensityR = self.motor_speed * max(min(1, rightInput), -1)
+    def input(self, left_input, right_input):
+        self.intensityL = self.motor_speed * max(min(1, left_input), -1)
+        self.intensityR = self.motor_speed * max(min(1, right_input), -1)
 
     def update(self, dt):
         translateL = self.intensityL * dt
@@ -25,7 +25,6 @@ class VexBot:
         else:
             # dx, dy, dtheta = self.turnRightTransformation(translateL, translateR)
             dx, dy, dtheta = rRT(translateL, translateR, self.wheel_width, self.angle)
-            
             
         self.xpos += dx
         self.ypos += dy
@@ -77,7 +76,7 @@ def rRT(translateL, translateR, wheel_width, angle):
     return dx, dy, -dtheta   
 
 def rotateVector(x, y, angle):
-        xprime = x * math.cos(angle) - y * math.sin(angle)
-        yprime = x * math.sin(angle) + y * math.cos(angle)
+    xprime = x * math.cos(angle) - y * math.sin(angle)
+    yprime = x * math.sin(angle) + y * math.cos(angle)
 
-        return xprime, yprime
+    return xprime, yprime

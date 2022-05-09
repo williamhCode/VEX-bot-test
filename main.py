@@ -4,7 +4,6 @@ from bot import VexBot
 from loader import ActionsLoader
 from actions import *
 
-
 import time as ti
 
 def rotate(surface, angle, pivot, offset):
@@ -24,7 +23,7 @@ def revY(ypos):
             
 def main():
     #SetupWindow
-    screen = pygame.display.set_mode((1200,900), pygame.SCALED, vsync = 1)
+    screen = pygame.display.set_mode((1200,900), pygame.SCALED)
     screen.set_alpha(None)
     pygame.display.set_caption('VEX-bot-test')
     
@@ -33,20 +32,27 @@ def main():
     botImg = pygame.image.load('pic/bot.png').convert_alpha()
     botImg = pygame.transform.smoothscale(botImg, (120,130))
 
-    bot_1 = VexBot(200,200,0, botImg.get_height(), botImg.get_width(), 350)
+    bot_1 = VexBot(200,200,-45, botImg.get_height(), botImg.get_width(), 350)
+    # bot_1 = VexBot(200,200,-90, botImg.get_height(), botImg.get_width(), 350)
 
-    straight = MoveToPointInLine(1000,200,True), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True)
-    spline = MoveHermiteSpline((1000, 200, 90), (1000, 800, 135), (300, 800, 225), (500, 200, 315))
-    spline = MoveHermiteSpline((200, 200, 0), (600, 100, 45), (800, 500, 90), (300, 700, 180))
-    actions = [spline]
+    straight_1 = MoveToPointInLine(800,200,False),
+    straight_2 = MoveToPointInLine(1000,200,False), MoveToPointInLine(1000,800,True), MoveToPointInLine(300,800,True), MoveToPointInLine(300,200,True), MoveHermiteSpline((200, 200, 0), (600, 100, 90), (800, 500, 90), (300, 700, 180))
+    spline_1 = MoveHermiteSpline((200, 200, 90), (1000, 700, 135), (300, 700, 225), (500, 200, 315)),
+    spline_2 = MoveHermiteSpline((200, 200, 0), (900, 200, 90), (800, 500, 90), (300, 700, 180)),
+    
+    # actions = straight_1
+    actions = spline_2
     loader = ActionsLoader(actions)
-
-    x = []
-    y = []
-    t = numpy.arange(0, spline.range, spline.range/300)
-    for i in t:
-        x.append(spline.splineX(i))
-        y.append(spline.splineY(i))
+    
+    if isinstance(actions[0], MoveHermiteSpline):
+        spline = actions
+        spline = spline[0]
+        x = []
+        y = []
+        t = numpy.arange(0, spline.range, spline.range/300)
+        for i in t:
+            x.append(spline.splineX(i))
+            y.append(spline.splineY(i))
 
     # positions = []
     # saved = False
@@ -61,16 +67,10 @@ def main():
     clock = pygame.time.Clock()
 
     while True:
-        can_render = False
-        time_2 = ti.time()
-        passed = time_2 - time
-        unprocessed += passed
-        time = time_2
-
-        while(unprocessed >= frame_cap):
-            unprocessed -= frame_cap
-            can_render = True
-    
+        # timer
+        dt = clock.tick(60)/1000
+        
+        # inputs and events ----------------------------- #
         left_input = 0
         right_input = 0
         
@@ -91,57 +91,60 @@ def main():
                     elif mode == 'auton':
                         mode = 'manual'
 
-        if True:
-            # dt = clock.tick()
-            # print(clock.get_fps())
-            dt = 1/60
-            screen.fill((255,255,255))
+        left_input = 0
+        right_input = 0
+        
+        if mode == 'manual':
+            keys = pygame.key.get_pressed()
 
-            if mode == 'manual':
-                left_input = 0
-                right_input = 0
+            if keys[pygame.K_w]:
+                left_input += 1
+            if keys[pygame.K_s]:
+                left_input -= 1
+            if keys[pygame.K_UP]:
+                right_input += 1
+            if keys[pygame.K_DOWN]:
+                right_input -= 1
+                
+            bot_1.input(left_input, right_input)
+            
+        elif mode == 'auton':
+            # positions.append(round(bot_1.xpos, 2))
+            # if not saved:
+            #     if round(bot_1.xpos, 2) == 800:
+            #         with open('positions.txt', 'w') as f:
+            #             for item in positions:
+            #                 f.write("%s\n" % item)
+            #         saved = True
 
-                keys = pygame.key.get_pressed()
+            left_input, right_input = loader.update(bot_1)
+            bot_1.input(left_input, right_input)
+        bot_1.update(dt)
 
-                if keys[pygame.K_w]:
-                    left_input += 1
-                if keys[pygame.K_s]:
-                    left_input -= 1
-                if keys[pygame.K_UP]:
-                    right_input += 1
-                if keys[pygame.K_DOWN]:
-                    right_input -= 1
-                    
-                bot_1.input(left_input, right_input)
-            elif mode == 'auton':
-                # positions.append(round(bot_1.xpos, 2))
-                # if not saved:
-                #     if round(bot_1.xpos, 2) == 800:
-                #         with open('positions.txt', 'w') as f:
-                #             for item in positions:
-                #                 f.write("%s\n" % item)
-                #         saved = True
+        # rendering --------------------------------------------- #
+        screen.fill((255, 255, 255))
+        
+        for action in actions:
+            if isinstance(action, MoveToPointInLine):
+                pygame.draw.circle(screen, (0,0,0), (action.gXpos, revY(action.gYpos)), 5)
+            elif isinstance(action, MoveHermiteSpline):
+                for data in action.dataList:
+                    pygame.draw.circle(screen, (0,0,0), (data[0], revY(data[1])), 5)
 
-                leftInput, rightInput = loader.update(bot_1)
-                bot_1.input(leftInput, rightInput)
-            bot_1.update(dt)
-
-            pygame.draw.circle(screen, (0,0,0), (1000,revY(200)),5)
-            pygame.draw.circle(screen, (0,0,0), (1000,revY(800)),5)
-            pygame.draw.circle(screen, (0,0,0), (300,revY(800)),5)
-            pygame.draw.circle(screen, (0,0,0), (300,revY(200)),5)
-
+        if isinstance(actions[0], MoveHermiteSpline):
             for i in range(len(t)):
                 pygame.draw.circle(screen, (0,0,0), (int(x[i]),revY(int(y[i]))),5)
 
-            botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos, revY(bot_1.ypos)], pygame.math.Vector2(0,0))
-            screen.blit(botImg_copy, botImg_copy_rect)
-            showPositions(screen, bot_1)
+        botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos, revY(bot_1.ypos)], pygame.math.Vector2(0,0))
+        screen.blit(botImg_copy, botImg_copy_rect)
+        showPositions(screen, bot_1)
 
-            position = font.render(f'Mode: {mode}, Coords: {bot_1.xpos:.2f}, {bot_1.ypos:.2f}', False, (0,0,0))
-            screen.blit(position, (25, 25))
-                
-            pygame.display.update()
+        position = font.render(f'Mode: {mode}, Coords: {bot_1.xpos:.2f}, {bot_1.ypos:.2f}', False, (0,0,0))
+        screen.blit(position, (25, 25))
+        motor_speeds = font.render(f'leftVel: {left_input:.2f}, rightVel: {right_input:.2f}', False, (0,0,0))
+        screen.blit(motor_speeds, (700, 25))
+            
+        pygame.display.update()
         
     
 if __name__ == '__main__':
@@ -149,4 +152,4 @@ if __name__ == '__main__':
     pygame.font.init()
     main()
     pygame.quit()
-    
+

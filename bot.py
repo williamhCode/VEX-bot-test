@@ -1,9 +1,9 @@
 import math
 
+
 class VexBot:
     
     def __init__(self, xpos, ypos, angle, distance, wheel_width, motor_speed):
-        # true states
         self.xpos = xpos
         self.ypos = ypos
         self.angle = angle
@@ -11,7 +11,8 @@ class VexBot:
         self.wheel_width = wheel_width
         self.motor_speed = motor_speed
         
-    def input(self, left_input, right_input):
+    # setting the motor speeds
+    def set_inputs(self, left_input, right_input):
         self.intensityL = self.motor_speed * max(min(1, left_input), -1)
         self.intensityR = self.motor_speed * max(min(1, right_input), -1)
 
@@ -20,62 +21,37 @@ class VexBot:
         translateR = self.intensityR * dt
             
         if translateL == translateR:
-            dx, dy = self.rotateVector(0, translateL, math.radians(self.angle))
+            dx, dy = rotate_vector(0, translateL, math.radians(self.angle))
             dtheta = 0
         else:
-            # dx, dy, dtheta = self.turnRightTransformation(translateL, translateR)
-            dx, dy, dtheta = rRT(translateL, translateR, self.wheel_width, self.angle)
+            dx, dy, dtheta = turn_transformation(translateL, translateR, self.wheel_width, self.angle)
             
         self.xpos += dx
         self.ypos += dy
         self.angle += math.degrees(dtheta)
 
-    def turnRightTransformation(self, translateL, translateR):
-        dtheta = (translateL - translateR)/self.wheel_width
-        radius = translateR/dtheta + self.wheel_width/2
-        dx = radius - math.cos(dtheta) * radius
-        dy = math.sin(dtheta) * radius
-        dx, dy = self.rotateVector(dx, dy, math.radians(self.angle))
-
-        return dx, dy, -dtheta
-    
-    def turnLeftTransformation(self, translateL, translateR):
-        dtheta = (translateR - translateL)/self.wheel_width
-        radius = translateL/dtheta + self.wheel_width/2
-        dx = math.cos(dtheta) * radius - radius
-        dy = math.sin(dtheta) * radius
-        dx, dy = self.rotateVector(dx, dy, math.radians(self.angle))
-
-        return dx, dy, dtheta
-        
-    def rotateVector(self, x, y, angle):
-        xprime = x * math.cos(angle) - y * math.sin(angle)
-        yprime = x * math.sin(angle) + y * math.cos(angle)
-
-        return xprime, yprime
-
-    def getOffsetPosition(self, offset, angle_diff):
+    def get_offset_position(self, offset, angle_diff):
         xpos = self.xpos + offset * math.cos(math.radians(self.angle + angle_diff))
         ypos = self.ypos + offset * math.sin(math.radians(self.angle + angle_diff))
 
         return xpos, ypos
 
-    def getWheelPositions(self):
-        wheelL_xpos, wheelL_ypos = self.getOffsetPosition(self.wheel_width/2, 180)
-        wheelR_xpos, wheelR_ypos = self.getOffsetPosition(self.wheel_width/2, 0)
+    def get_wheel_positions(self):
+        wheelL_xpos, wheelL_ypos = self.get_offset_position(self.wheel_width / 2, 180)
+        wheelR_xpos, wheelR_ypos = self.get_offset_position(self.wheel_width / 2, 0)
 
         return wheelL_xpos, wheelL_ypos, wheelR_xpos, wheelR_ypos
 
-def rRT(translateL, translateR, wheel_width, angle):
-    dtheta = (translateL - translateR)/wheel_width
-    radius = translateR/dtheta + wheel_width/2
+def turn_transformation(translateL, translateR, wheel_width, angle):
+    dtheta = (translateL - translateR) / wheel_width
+    radius = translateR / dtheta + wheel_width / 2
     dx = radius - math.cos(dtheta) * radius
     dy = math.sin(dtheta) * radius
-    dx, dy = rotateVector(dx, dy, math.radians(angle))
+    dx, dy = rotate_vector(dx, dy, math.radians(angle))
 
-    return dx, dy, -dtheta   
+    return dx, dy, -dtheta
 
-def rotateVector(x, y, angle):
+def rotate_vector(x, y, angle):
     xprime = x * math.cos(angle) - y * math.sin(angle)
     yprime = x * math.sin(angle) + y * math.cos(angle)
 

@@ -1,24 +1,26 @@
 from bot import VexBot
+from actions import Action
+
 
 class ActionsLoader:
 
-    def __init__(self, actions):
+    def __init__(self, actions: list[Action]):
         self.actions = actions
         self.step = 0
         self.currentAction = self.actions[self.step]
 
-    def addAction(self, action):
+    def add_action(self, action: Action):
         self.actions.append(action)
 
-    def reset(self, bot):
+    def reset(self, bot: VexBot):
         self.step = 0
         self.currentAction = self.actions[self.step]
-        self.currentAction.setUp(bot)
+        self.currentAction.set_up(bot)
 
-    def setUp(self, bot):
-        self.currentAction.setUp(bot)
+    def set_up(self, bot: VexBot):
+        self.currentAction.set_up(bot)
 
-    def update(self, bot:VexBot):
+    def update(self, bot: VexBot):
         if self.step == None:
             return 0, 0
 
@@ -28,7 +30,7 @@ class ActionsLoader:
                 return 0, 0
             self.step += 1
             self.currentAction = self.actions[self.step]
-            self.currentAction.setUp(bot)
+            self.currentAction.set_up(bot)
 
         leftInput, rightInput = self.currentAction.update(bot)
 

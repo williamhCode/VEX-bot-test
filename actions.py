@@ -24,9 +24,9 @@ class MoveToPointInLine(Action):
         self.g_ypos = ypos
         self.reverse = reverse
 
-        kP = 0.015
+        kP = 0.01
         kI = 0.0
-        kD = 0.1
+        kD = 0.2
         self.turnPID = PID(kP, kI, kD)
 
         kP = 0.01
@@ -119,28 +119,16 @@ class MoveHermiteSpline(Action):
         kD = 0.4
         self.turn_pid = PID(kP, kI, kD)
 
-        # kP = 0.01
-        # kI = 0.0
-        # kD = 0.0
-        # self.PID = PID(kP, kI, kD)
-
     def set_up(self, bot: VexBot):
         self.t = 0
 
         cte = self.get_cte(bot)
         self.turn_pid.set_up(cte, 0)
 
-        # dist = self.getDist(bot)
-        # self.PID.setUp(dist, 0)
-
     def update(self, bot: VexBot):
         cte = self.get_cte(bot)
         output = self.turn_pid.update(cte)
 
-        # dist = self.getDist(bot)
-        # baseOutput = min(1, -self.PID.update(dist))
-        # leftInput = baseOutput
-        # rightInput = baseOutput
         leftInput = 1
         rightInput = 1
 
@@ -149,10 +137,7 @@ class MoveHermiteSpline(Action):
         return leftInput + min(output, 0), rightInput - max(output, 0)
 
     def stop(self, bot: VexBot):
-        return False
-
-    def get_dist(self, bot: VexBot):
-        pass
+        return self.t >= self.range
 
     def get_cte(self, bot: VexBot):
         rate = 0.1
@@ -194,6 +179,10 @@ class PID:
 
         self.prevError = self.error
 
-        outputPower = self.error * self.kP + self.derivative * self.kD + self.totalError * self.kI
+        outputPower = (
+            self.error * self.kP + 
+            self.derivative * self.kD + 
+            self.totalError * self.kI
+        )
 
         return outputPower

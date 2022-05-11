@@ -24,7 +24,7 @@ class ActionsLoader:
         if self.step == None:
             return 0, 0
 
-        if self.actions[self.step].stop(bot):
+        if self.currentAction.stop(bot):
             if self.step == len(self.actions)-1:
                 self.step = None
                 return 0, 0

@@ -7,7 +7,7 @@ from actions import *
 def rotate(surface, angle, pivot, offset):
     rotated_image = pygame.transform.rotozoom(surface, angle, 1)
     rotated_offset = offset.rotate(-angle)
-    rect = rotated_image.get_rect(center= pivot+rotated_offset)
+    rect = rotated_image.get_rect(center=pivot + rotated_offset)
     return rotated_image, rect
 
 def show_wheel_positions(screen, vehicle: VexBot):
@@ -36,28 +36,29 @@ def main():
     bot_1 = VexBot(200, 200, -45, botImg.get_height(), botImg.get_width(), 350)
 
     # initialize paths/actions
-    actions: list[Action]
+    straight = [MoveToPointInLine(1000, 200, False), MoveToPointInLine(1000, 800, True), MoveToPointInLine(300, 800, True), MoveToPointInLine(300, 200, True)]
+    spline_1 = [MoveHermiteSpline((300, 200, 90), (1000, 700, 135), (300, 700, 225), (500, 200, 315))]
+    spline_2 = [MoveHermiteSpline((500, 200, 0), (900, 200, 90), (800, 500, 90), (300, 700, 180))]
 
-    straight_1 = [MoveToPointInLine(800, 200, False)]
-    straight_2 = [MoveToPointInLine(1000, 200, False), MoveToPointInLine(1000, 800, True), MoveToPointInLine(
-        300, 800, True), MoveToPointInLine(300, 200, True), MoveHermiteSpline((200, 200, 0), (600, 100, 90), (800, 500, 90), (300, 700, 180))]
-    spline_1 = [MoveHermiteSpline((200, 200, 90), (1000, 700, 135), (300, 700, 225), (500, 200, 315))]
-    spline_2 = [MoveHermiteSpline((200, 200, 0), (900, 200, 90), (800, 500, 90), (300, 700, 180))]
-
-    actions = spline_1
+    actions: list[Action] = straight + spline_1 + spline_2
     actions_loader = ActionsLoader(actions)
 
-    # data for drawing the spline
-    if isinstance(actions[0], MoveHermiteSpline):
-        spline: MoveHermiteSpline = actions
-        spline = spline[0]
-        x = []
-        y = []
-        t = numpy.arange(0, spline.range, spline.range / 300)
-        for i in t:
-            x.append(spline.spline_x(i))
-            y.append(spline.spline_y(i))
-
+    action_datas: list[tuple[list[float], list[float]]] = []
+    # data for drawing the actions
+    for action in actions:
+        if isinstance(action, MoveToPointInLine):
+            action_datas.append(([action.g_xpos], [action.g_ypos]))
+        
+        elif isinstance(action, MoveHermiteSpline):
+            x = []
+            y = []
+            t = numpy.arange(0, action.range, action.range / 300)
+            for i in t:
+                x.append(action.spline_x(i))
+                y.append(action.spline_y(i))
+            action_datas.append((x, y))
+                
+                
     # game loop ------------------------------------- #
     mode = 'manual'
     clock = pygame.time.Clock()
@@ -109,30 +110,24 @@ def main():
         # rendering --------------------------------------------- #
         screen.fill((255, 255, 255))
 
-        # draw points
-        for action in actions:
-            if isinstance(action, MoveToPointInLine):
-                pygame.draw.circle(screen, (0,0,0), (action.g_xpos, revY(action.g_ypos)), 5)
-
-            elif isinstance(action, MoveHermiteSpline):
-                for data in action.data_list:
-                    pygame.draw.circle(screen, (0,0,0), (data[0], revY(data[1])), 5)
-
         # draw spline
-        if isinstance(actions[0], MoveHermiteSpline):
-            for i in range(len(t)):
-                pygame.draw.circle(screen, (0,0,0), (int(x[i]),revY(int(y[i]))),5)
+        if actions_loader.step is not None:
+            curr_data = action_datas[actions_loader.step]
+            x_list = curr_data[0]
+            y_list = curr_data[1]
+            for i in range(len(x_list)):
+                pygame.draw.circle(screen, (0, 0, 0), (int(x_list[i]), revY(int(y_list[i]))), 5)
 
         # draw robot
-        botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos, revY(bot_1.ypos)], pygame.math.Vector2(0,0))
+        botImg_copy, botImg_copy_rect = rotate(botImg, bot_1.angle, [bot_1.xpos, revY(bot_1.ypos)], pygame.math.Vector2(0, 0))
         screen.blit(botImg_copy, botImg_copy_rect)
         show_wheel_positions(screen, bot_1)
 
         # draw text
-        position = font.render(f'Mode: {mode}, Coords: {bot_1.xpos:.2f}, {bot_1.ypos:.2f}', False, (0,0,0))
+        position = font.render(f'Mode: {mode}, Coords: {bot_1.xpos:.2f}, {bot_1.ypos:.2f}', False, (0, 0, 0))
         screen.blit(position, (25, 25))
 
-        motor_speeds = font.render(f'leftVel: {left_input:.2f}, rightVel: {right_input:.2f}', False, (0,0,0))
+        motor_speeds = font.render(f'leftVel: {left_input:.2f}, rightVel: {right_input:.2f}', False, (0, 0, 0))
         screen.blit(motor_speeds, (700, 25))
 
         pygame.display.update()

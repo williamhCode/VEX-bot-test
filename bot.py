@@ -3,18 +3,18 @@ import math
 
 class VexBot:
     
-    def __init__(self, xpos, ypos, angle, distance, wheel_width, motor_speed):
+    def __init__(self, xpos, ypos, angle, distance, wheel_width, max_speed):
         self.xpos = xpos
         self.ypos = ypos
         self.angle = angle
         self.distance = distance
         self.wheel_width = wheel_width
-        self.motor_speed = motor_speed
+        self.max_speed = max_speed
         
     # setting the motor speeds
     def set_inputs(self, left_input, right_input):
-        self.intensityL = self.motor_speed * max(min(1, left_input), -1)
-        self.intensityR = self.motor_speed * max(min(1, right_input), -1)
+        self.intensityL = self.max_speed * max(min(1, left_input), -1)
+        self.intensityR = self.max_speed * max(min(1, right_input), -1)
 
     def update(self, dt):
         translateL = self.intensityL * dt

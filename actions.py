@@ -3,6 +3,7 @@ from bot import VexBot
 import math
 from abc import ABC, abstractmethod
 
+
 class Action(ABC):
     
     @abstractmethod
@@ -16,6 +17,7 @@ class Action(ABC):
     @abstractmethod
     def stop(self, bot: VexBot) -> bool:
         pass
+
 
 class MoveToPointInLine(Action):
 

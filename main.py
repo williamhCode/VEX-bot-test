@@ -33,7 +33,7 @@ def main():
     botImg = pygame.transform.smoothscale(botImg, (120, 130))
 
     # create bot
-    bot_1 = VexBot(200, 200, -45, botImg.get_height(), botImg.get_width(), 350)
+    bot_1 = VexBot(200, 200, -45, botImg.get_height(), 350)
 
     # initialize paths/actions
     straight = [MoveToPointInLine(1000, 200, False), MoveToPointInLine(1000, 800, True), MoveToPointInLine(300, 800, True), MoveToPointInLine(300, 200, True)]

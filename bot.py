@@ -3,11 +3,10 @@ import math
 
 class VexBot:
     
-    def __init__(self, xpos, ypos, angle, distance, wheel_width, max_speed):
+    def __init__(self, xpos, ypos, angle, wheel_width, max_speed):
         self.xpos = xpos
         self.ypos = ypos
         self.angle = angle
-        self.distance = distance
         self.wheel_width = wheel_width
         self.max_speed = max_speed
         

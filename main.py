@@ -18,7 +18,7 @@ def show_wheel_positions(screen, vehicle: VexBot):
 
 def revY(ypos):
     return -ypos + 900
-            
+    
 def main():
     # initalization ------------------------------------ #
     # setup window
@@ -134,7 +134,6 @@ def main():
         
     
 if __name__ == '__main__':
-    pygame.init()
+    pygame.font.init()
     main()
     pygame.quit()
-

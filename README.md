@@ -1,2 +1,2 @@
 # VEX-bot-test
-PID and path finding simulator for VEX robotics, created with Pygame.
+Pathing simulator for VEX robotics, created with Pygame.
